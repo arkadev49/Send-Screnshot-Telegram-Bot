@@ -1,7 +1,8 @@
 import os
+import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 import telegram
-import pyautogui as gui
-from datetime import datetime
 
 COUNTRY_CODE = '+91'
 
@@ -67,25 +68,36 @@ except (ValueError, FileNotFoundError) as e:
           "'RECEIVER ID'] in the respective files before running this script.")
     exit(0)
 
-# ****************************************************************
-#    TAKING SCREENSHOT AND SAVING INTO THE 'Screenshots' Folder
-# ****************************************************************
-
-ss = gui.screenshot()
-PATH = curr_dir + '\\Screenshots\\'
-f_name = str(datetime.now().timestamp()) + '_Screenshot.png'
-
-f = PATH + f_name
-
-ss.save(f)
 
 # ****************************************************************
-#                         SENDING IMAGE
+#            SENDING IMAGE ONCE A SCREENSHOT IS CAPTURED
 # ****************************************************************
+
+
+class ExampleHandler(FileSystemEventHandler):
+    count = 0
+
+    def on_created(self, event):
+        try:
+            bot = telegram.Bot(token=bot_api_token)
+            bot.send_photo(SEND_TO, photo=open(event.src_path, 'rb'))
+            self.count += 1
+            print("Screenshot send successfully! - ", self.count)
+        except Exception as ev:
+            print("SENDING UNSUCCESSFUL!")
+            print(ev)
+
+
+observer = Observer()
+event_handler = ExampleHandler()
+observer.schedule(event_handler, path='C:\\Users\\arkad\\Pictures\\Screenshots')
+observer.start()
+
 
 try:
-    bot = telegram.Bot(token=bot_api_token)
-    bot.send_photo(SEND_TO, photo=open(f, 'rb'))
-    print("Screenshot send successfully!")
-except:
-    print("SENDING UNSUCCESSFUL!")
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    observer.stop()
+
+observer.join()
