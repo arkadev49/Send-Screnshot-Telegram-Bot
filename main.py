@@ -4,26 +4,12 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import telegram
 
-COUNTRY_CODE = '+91'
-
 # ****************************************************************
 #              CREATING SETUP FILES (FIRST TIME ONLY)
 # ****************************************************************
 
 curr_dir = os.getcwd()
 f_list = os.listdir(curr_dir)
-if 'Screenshots' not in f_list:
-    os.mkdir(curr_dir + '\\Screenshots')
-
-if 'send.bat' not in f_list:
-    with open(curr_dir + '\\send.bat', 'w') as fp:
-        fp.write('python main.py')
-
-if 'send.vbs' not in f_list:
-    with open(curr_dir + '\\send.vbs', 'w') as fp:
-        fp.write('''Set WshShell = CreateObject("WScript.Shell") 
-WshShell.Run chr(34) & "send.bat" & Chr(34), 0
-Set WshShell = Nothing''')
 
 inputs = [
     'YOUR_BOT_API_TOKEN_HERE.txt',
